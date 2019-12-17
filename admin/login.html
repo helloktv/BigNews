@@ -15,6 +15,7 @@
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <!-- 引入bootstrap的js文件 -->
   <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+  <script src="./libs/http.js"></script>
 </head>
 
 <body>
@@ -37,7 +38,73 @@
       </form>
     </div>
   </div>
+  <!-- 这个是模态框 -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">友情提示</h4>
+        </div>
+        <div class="modal-body">
+          <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">确认</button>
+          <!-- <button type="button" class="btn btn-primary">确认</button> -->
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <script>
+    $(function () {
 
+      $('.input_sub').on('click', function (e) {
+        console.log(111);
+        e.preventDefault();
+        var username = $('.input_txt').val().trim();
+        var password = $('.input_pass').val().trim();
+        if (username == '' || password == '') {
+          $('.modal-body>p').text('用户名或密码不能为空');
+          $('#myModal').modal({
+            keyboard: true
+          })
+          return;
+        }
+        $.ajax({
+          url: BigNew.user_login,
+          type: 'post',
+          data: {
+            username: username,
+            password: password
+          },
+          success: function (backData) {
+            console.log(backData);
+            if (backData.code == 200) {
+              $('.modal-body>p').text('登录成功');
+              $('#myModal').modal({
+                keyboard: true
+              })
+              $('#myModal').on('hidden.bs.modal', function (e) {
+                // do something...
+                localStorage.setItem('token',backData.token);
+                window.location.href = './index.html';
+              })
+             
+            } else {
+              $('.modal-body>p').text(backData.msg);
+              $('#myModal').modal({
+                keyboard: true
+              })
+
+            }
+          }
+        })
+      })
+
+    })
+  </script>
 </body>
 
 </html>

@@ -13,6 +13,7 @@
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 导入bootstrap的js文件 -->
     <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./libs/http.js"></script>
 </head>
 
 <body>
@@ -51,8 +52,51 @@
         </div>
         <!-- 右侧主体内容 -->
         <div class="main" id="main_body">
-
+            <iframe src="./main_count.html" frameborder="0" style="width: 100%; height: 100%;"></iframe>
+            
         </div>
+
     </div>
+    <script>
+        $(function () {
+
+            //设置token秘钥保存服务器返回的值
+            $.ajaxSetup({
+                beforeSend(xhr) {
+                    xhr.setRequestHeader('Authorization', localStorage.getItem('token'))
+                },
+                error(xhr, status, error) {
+                    if (error == "Forbidden") {
+                        alert('请先登录')
+                        window.location.href = './login.html'
+                    }
+                }
+
+
+            })
+            $.ajax({
+                url: BigNew.user_info,
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    if (backData.code == 200) {
+                        $('.user_info>img').attr({ src: backData.data.userPic });
+                        $('.user_info>span').html('欢迎&nbsp&nbsp' + backData.data.nickname);
+                        $('.user_center_link>img').attr({ src: backData.data.userPic })
+                    }
+                }
+            })
+            $('.user_center_link a:last').on('click', function () {
+                if (confirm('确定吗')) {
+                    localStorage.removeItem('token')
+                    window.location.href = './login.html'
+                }
+            })
+
+        });
+
+    </script>
 </body>
+
 </html>
